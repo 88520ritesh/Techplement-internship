@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Quotes</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+#daily-quote {
+  margin-bottom: 20px;
+}
+
+#author_input {
+  width: 200px;
+  padding: 5px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#search-results {
+  margin-top: 10px;
+}
+  </style>
+</head>
+<body>
+  <h1>Daily Quote</h1>
+  <div id="daily-quote" style="margin: 20px 20%;"></div>
+  
+  <h2>Search Quotes by Author</h2>
+  <div style="margin: 0 40%;">
+      <input type="text" id="author_input" placeholder="Enter author name">
+      <button onclick="searchQuotes()" type="submit">Search</button>
+  </div>
+  <div id="search-results"></div>
+
+  <script>
+
+    async function fetchDailyQuote() {
+      try {
+        const response = await fetch('/api');
+        const data = await response.json();
+        document.getElementById('daily-quote').innerText = `${data.quoteText} - ${data.quoteAuthor}`;
+      } catch (error) {
+        console.error('Error fetching daily quote:', error);
+      }
+    }
+
+    async function searchQuotes() {
+      const author = document.getElementById('author_input').value.trim();
+      if (!author) {
+        return alert('Please enter an author name');
+      }
+
+      try {
+        const response = await fetch(`/search`);
+        const data = await response.json();
+        if (!data.quoteAuthor) {
+          document.getElementById('search-results').innerText = 'No quotes found for this author';
+        } else {
+          document.getElementById('search-results').innerText = `${data.quoteText} - ${data.quoteAuthor}`;
+        }
+      } catch (error) {
+        console.error('Error searching quotes by author:', error);
+        document.getElementById('search-results').innerText = 'Failed to search quotes';
+      }
+    }
+
+    // Fetch daily quote when the page loads
+    fetchDailyQuote();
+  </script>
+</body>
+</html>
